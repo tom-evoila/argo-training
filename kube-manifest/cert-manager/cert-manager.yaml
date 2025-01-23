@@ -14,6 +14,10 @@ spec:
       parameters:
         - name: installCRDs
           value: "true"
+        - name: podLabels.azure.workload.identity/use
+          value: "true"
+        - name: serviceAccount.labels.azure.workload.identity/use
+          value: "true"
     repoURL: https://charts.jetstack.io
     targetRevision: v1.3.1
   syncPolicy:

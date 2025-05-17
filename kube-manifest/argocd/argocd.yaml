@@ -1,0 +1,126 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: argocd
+  namespace: argocd
+spec:
+  project: default
+  destination:
+    namespace: argocd
+    server: https://kubernetes.default.svc
+  syncPolicy:
+    automated:
+      prune: false # Specifies if resources should be pruned during auto-syncing ( false by default ).
+      selfHeal: true # Specifies if partial app sync should be executed when resources are changed only in target Kubernetes cluster and no git change detected ( false by default ).
+      allowEmpty: false # Allows deleting all application resources during automatic syncing ( false by default ).
+    syncOptions:
+      - CreateNamespace=true
+  source:
+    chart: argo-cd
+    repoURL: https://argoproj.github.io/argo-helm
+    targetRevision: 8.0.3
+
+    # https://github.com/argoproj/argo-helm/tree/main/charts/argo-cd
+    helm:
+      releaseName: argo
+      valuesObject:
+        fullnameOverride: argocd
+        applicationSet:
+          enabled: false
+        notifications:
+          enabled: false
+        configs:
+          secret:
+            createSecret: false
+          cm:
+            url: { { .Values.argodomain } }
+            #exec.enabled: "true"
+          params:
+            # server.insecure: true
+
+        ## Controller ##
+        controller:
+          # resources:
+          #   limits:
+          #     cpu: 1
+          #     memory: 1024Mi
+          #   requests:
+          #     cpu: 500m
+          #     memory: 1024Mi
+          # metrics:
+          #   enabled: true
+          #   serviceMonitor:
+          #     enabled: false # true
+          #     namespace: argocd
+          #     additionalLabels:
+          #       prometheus.io/scrap-with: kube-prometheus-stack
+
+        ## DEX ##
+        dex:
+          enabled: false
+          # metrics:
+          #   enabled: true
+          #   serviceMonitor:
+          #     enabled: false # true
+          #     namespace: argocd
+          #     additionalLabels:
+          #       prometheus.io/scrap-with: kube-prometheus-stack
+
+        ## RepoServer ##
+        repoServer:
+          # resources:
+          #   limits:
+          #     cpu: 500m
+          #     memory: 1.5Gi
+          #   requests:
+          #     cpu: 250m
+          #     memory: 512Mi
+          # metrics:
+          #   enabled: true
+          #   serviceMonitor:
+          #     enabled: false # true
+          #     namespace: argocd
+          #     additionalLabels:
+          #       prometheus.io/scrap-with: kube-prometheus-stack
+
+        ## Redis ##
+        redis:
+          # resources:
+          #   limits:
+          #     cpu: 120m
+          #     memory: 256Mi
+          #   requests:
+          #     cpu: 120m
+          #     memory: 256Mi
+          # metrics:
+          #   enabled: true
+          #   serviceMonitor:
+          #     enabled: false # true
+          #     additionalLabels:
+          #       prometheus.io/scrap-with: kube-prometheus-stack
+          #     namespace: argocd
+
+        ## Server ##
+        server:
+          extraArgs:
+            - --insecure
+          # resources:
+          #   limits:
+          #     cpu: 400m
+          #     memory: 512Mi
+          #   requests:
+          #     cpu: 400m
+          #     memory: 512Mi
+
+          # Ingress
+          service:
+            annotations:
+              #cloud.google.com/neg: '{"ingress": true}'
+              #cloud.google.com/backend-config: '{"default": "backend-config-argocd"}'
+          # metrics:
+          #   enabled: true
+          #   serviceMonitor:
+          #     enabled: false # true
+          #     additionalLabels:
+          #       prometheus.io/scrap-with: kube-prometheus-stack
+          #     namespace: argocd

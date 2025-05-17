@@ -33,7 +33,7 @@ spec:
           secret:
             createSecret: false
           cm:
-            url: { { .Values.argodomain } }
+            url: argo.ev.soltari.at
             #exec.enabled: "true"
           params:
             # server.insecure: true

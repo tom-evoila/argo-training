@@ -33,7 +33,7 @@ spec:
           secret:
             createSecret: false
           cm:
-            url: argo.ev.soltari.at
+            url: http://argo.ev.soltari.at
             #exec.enabled: "true"
           params:
             # server.insecure: true
